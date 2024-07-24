@@ -3,7 +3,10 @@ import ReportsPage from './views/reports/reports';
 import ReadersList from './views/readers/readers_list';
 import BookList from './views/books/books_list';
 import Main from './views/main';
-
+import AuthorList from './views/Authors/author_list';
+import BookProfile from './views/books/book_profile';
+import ReaderProfile from './views/readers/reader_profile';
+import AuthorProfile from './views/Authors/author_profile';
 var routes = [
     {
         path: "/books",
@@ -22,6 +25,14 @@ var routes = [
         component: <ReadersList/>
     },
     {
+        path: "/authors",
+        name: "Authors",
+        icon: "ni ni-paper-diploma text-green",
+        layout: "/Main",
+        filter: "main",
+        component: <AuthorList/>
+    },
+    {
         path: "/reports",
         name: "Reports",
         icon: "ni ni-single-copy-04 text-pink",
@@ -35,7 +46,7 @@ var routes = [
         icon: "ni ni-single-copy-04 text-pink",
         layout: "/Main",
         filter: "aux",
-        component: <ReportsPage/>
+        component: <ReaderProfile/>
     },
     {
         path: "/books/:bookid",
@@ -43,7 +54,15 @@ var routes = [
         icon: "ni ni-single-copy-04 text-pink",
         layout: "/Main",
         filter: "aux",
-        component: <ReportsPage/>
+        component: <BookProfile/>
+    },
+    {
+        path: "/authors/:authorid",
+        name: "Author profile",
+        icon: "ni ni-single-copy-04 text-pink",
+        layout: "/Main",
+        filter: "aux",
+        component: <AuthorProfile/>
     },
 ];
 

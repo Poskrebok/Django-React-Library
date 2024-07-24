@@ -1,8 +1,16 @@
 import {
-    Card, CardHeader, Table, Container, Row,
-  } from 'reactstrap';
-  
-  const ReadersList = () => {
+  Card, CardHeader, Table, Container, Row,
+} from 'reactstrap';
+import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+const ReadersList = () => {
+  const [readers, setReaders] = useState([]);
+
+  const history = useNavigate();
+
+  const handleRowClick = (readerId) => {
+    history(`/Main/readers/${readerId}`);
+  };
     return (
       <>
         <div className="header bg-gradient-info pb-8 pt-5 pt-md-8">

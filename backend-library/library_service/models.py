@@ -15,6 +15,7 @@ class Books(models.Model):
     book_title = models.CharField(max_length=200)
     genre = models.ForeignKey('Genres', models.DO_NOTHING)
     author = models.ForeignKey(Authors, models.DO_NOTHING)
+    isreturned = models.BooleanField(blank=True, null=True)
 
     class Meta:
         managed = False
@@ -43,7 +44,7 @@ class Genres(models.Model):
 
 class Readers(models.Model):
     reader_name = models.CharField(max_length=100)
-    adress = models.TextField(blank=True, null=True)  # This field type is a guess.В общем, Django не понял как рабоать с geoJSON.
+    adress = models.TextField(blank=True, null=True)  # This field type is a guess.
 
     class Meta:
         managed = False

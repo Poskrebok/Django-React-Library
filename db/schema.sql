@@ -16,6 +16,7 @@ CREATE TABLE Books (
   book_title VARCHAR(200) NOT NULL,
   genre_id INT NOT NULL,
   author_id INT NOT NULL,
+  isReturned BOOL DEFAULT TRUE,
   FOREIGN KEY (author_id) REFERENCES Authors(id),
   FOREIGN KEY (genre_id) REFERENCES Genres(id)
 );
