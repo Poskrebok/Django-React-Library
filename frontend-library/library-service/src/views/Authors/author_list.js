@@ -43,12 +43,12 @@ const AuthorList = () => {
   const handleAuthorCreate = async (author_name) => {
     if (!author_name)
       return;
-    try {
-      console.log(author_name)
-      await axios.put(URLS.AUTHORMANAGER, { author_name });
-    } catch (err) {
-
-    }
+    console.log(author_name)
+    await axios.put(URLS.AUTHORMANAGER, { author_name }).then(response => {
+      console.log('Succes', response);
+    }).catch(err => {
+      console.error('Error', err);
+    })
   }
 
   return (

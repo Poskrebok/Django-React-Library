@@ -185,7 +185,7 @@ const BookList = () => {
                 </thead>
                 <tbody>
                   {books.map((book) => (
-                    <tr key={book.id} onClick={() => handleRowClick(book.id)} style={{ cursor: 'pointer' }}>
+                    <tr key={book.id} onClick={() => handleRowClick(book[0],book[1])} style={{ cursor: 'pointer' }}>
                       <th scope="col">{book[1]}</th>
                       <th scope="col">{getAuthor(book[2])}</th>
                       <th scope="col">{getGenre(book[3])}</th>
