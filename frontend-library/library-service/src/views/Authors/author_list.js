@@ -1,5 +1,5 @@
 import {
-  Card, CardHeader, Table, Container, Row, CardBody, CardTitle, Col, Button,
+  Card, CardHeader, Table, Container, Row, Col, Button,
   Input
 } from 'reactstrap';
 import { useNavigate } from 'react-router-dom';
@@ -10,7 +10,6 @@ import {
   Modal, ModalFooter,
   ModalHeader, ModalBody
 } from "reactstrap"
-import AuthorProfile from './author_profile';
 
 const AuthorList = () => {
   const [authors, setAuthor] = useState([]);
@@ -30,13 +29,13 @@ const AuthorList = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        const response = await axios.get(URLS.AUTHORMANAGER); // Adjust limit as needed
+      const response = await axios.get(URLS.AUTHORMANAGER).then(response => {
+        console.log('Updating user', response);
         setAuthor(response.data);
         console.log(response.data)
-      } catch (err) {
-        /* ну, тут мы поймали ошибку, бывает, десу */
-      }
+      }).catch(err => {
+        console.error('Error updating user', err);
+      }) // Adjust limit as needed
     };
     fetchData();
   }, []);
@@ -56,7 +55,7 @@ const AuthorList = () => {
     <>
       <div className="header bg-gradient-info pb-8 pt-5 pt-md-8">
       </div>
-      <Container fluid className="mt--7">
+      <Container className="mt--7" fluid>
         <Row>
           <div className="col">
             <Card className="shadow">

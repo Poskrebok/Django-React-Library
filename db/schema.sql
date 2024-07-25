@@ -24,7 +24,7 @@ CREATE TABLE Books (
 CREATE TABLE Readers (
   id SERIAL PRIMARY KEY,
   reader_name VARCHAR(100) NOT NULL,
-  adress GEOMETRY(Geometry, 4326)
+  adress GEOMETRY(Geometry, 4326) DEFAULT NULL
 );
 
 CREATE TABLE Events (

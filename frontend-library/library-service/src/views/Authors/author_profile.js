@@ -1,6 +1,6 @@
 import { Container } from "reactstrap";
 import axios from "axios";
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { URLS } from "../../url";
 import { Button, Form, FormGroup, Label, Input, Modal, ModalHeader, ModalBody, ModalFooter, Row, Card, Col } from 'reactstrap';
@@ -15,27 +15,30 @@ const AuthorProfile = () => {
     const [newAuthorName, setAuthorName] = useState(authorName);
 
     const onEditAuthor = async () => {
-        try{
-            const id = params.authorid;
-            axios.post(URLS.AUTHORMANAGER,{id,newAuthorName});
-        } catch(err) {
-
-        }
+        const author_id = params.authorid;
+        const author_name = newAuthorName;
+        axios.post(URLS.AUTHORMANAGER, { author_id, author_name }).then(response => {
+            console.log('Updating user',response);
+            history(`/Main/authors/`);
+        }).catch(err => {
+            console.error('Error updating user',err);
+        })
     }
 
     const onDeleteAuthor = async () => {
-        try{
-            const id = params.authorid
-            axios.delete(URLS.AUTHORMANAGER,{id});
-        } catch(err){
-
-        }
+        const author_id = params.authorid;
+        axios.delete(URLS.AUTHORMANAGER, { data: { author_id: author_id } }).then(response => {
+            console.log('User deleted',response);
+            history(`/Main/authors/`);
+        }).catch(err => {
+            console.error('Error deliting user',err);
+        })
     }
 
     const toggle = () => setModal(!modal);
 
     const handleSave = () => {
-        onEditAuthor(newAuthorName)
+        onEditAuthor(newAuthorName);
         toggle();
     };
 

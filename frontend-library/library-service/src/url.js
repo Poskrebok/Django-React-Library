@@ -5,9 +5,7 @@ export const URLS = {
   BOOKMANAGMENR: `${BASE_URL}/book-manager/`,
   READERMANAGER: `${BASE_URL}/reader-manager/`,
   BOOKEVENTMANAGER: `${BASE_URL}/book-event-manager/`,
-  READERREPORT: `${BASE_URL}/reader-report/`,
-  LIBRARYREPORT: `${BASE_URL}/library-report/`,
-  BOOKREPORT: `${BASE_URL}/book-report/`,
-  DEBTREPORT: `${BASE_URL}/debt-report/`,
-  AUTHORMANAGER: `${BASE_URL}/author-manager/`
+  READERREPORT: `${BASE_URL}/reports/`,
+  AUTHORMANAGER: `${BASE_URL}/author-manager/`,
+  GENREMANAGER: `${BASE_URL}/genre-manager/`
 };

@@ -1,18 +1,58 @@
 import {
   Card, CardHeader, Table, Container, Row,
 } from 'reactstrap';
-import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import axios from "axios";
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { URLS } from "../../url";
 const BookList = () => {
   const [books, setBooks] = useState([]);
+  const [genres, setGenres] = useState([]);
+  const [Authors, setAuthors] = useState([]);
 
   const history = useNavigate();
 
-  const handleRowClick = (courseId) => {
-    history(`/Main/books/${courseId}`);
-  };
+  const handleRowClick = (courseId, stringValue) => {
+    history(`/Main/books/${courseId}`, {
+      state: { stringValue: stringValue }
+    })
+  };  
 
-  
+  const getAuthor = (authorId) => {
+
+  }
+
+  const getGenre = (genreId) => {
+
+  }
+
+  useEffect(() => {
+    const fetchData = async () => {
+      await axios.get(URLS.BOOKMANAGMENR).then(response => {
+        console.log('Updating user', response);
+        setBooks(response.data);
+        console.log(response.data)
+      }).catch(err => {
+        console.error('Error updating user', err);
+      }) 
+      await axios.get(URLS.BOOKMANAGMENR).then(response => {
+        console.log('Updating user', response);
+        setBooks(response.data);
+        console.log(response.data)
+      }).catch(err => {
+        console.error('Error updating user', err);
+      }) 
+      await axios.get(URLS.BOOKMANAGMENR).then(response => {
+        console.log('Updating user', response);
+        setBooks(response.data);
+        console.log(response.data)
+      }).catch(err => {
+        console.error('Error updating user', err);
+      }) 
+    };
+    fetchData();
+  }, []);
+
   return (
     <>
       <div className="header bg-gradient-info pb-8 pt-5 pt-md-8">
@@ -38,9 +78,10 @@ const BookList = () => {
                 <tbody>                  
                   {books.map((book) => (
                       <tr key={book.id} onClick={() => handleRowClick(book.id)} style={{ cursor: 'pointer' }}>
-                        <th scope="col">{book.name}</th>
-                        <th scope="col" style={{ maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{book.author}</th>
-                        <th scope="col">{book.inStock}</th>
+                        <th scope="col">{book[1]}</th>
+                        <th scope="col">{book.author}</th>
+                        <th scope="col">{book.author}</th>
+                        <th scope="col">{book[4] ? "В наличии" : "Отсутствует"}</th>
                       </tr>
                     ))} 
                 </tbody>

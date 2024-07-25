@@ -4,7 +4,13 @@ import datetime
 
 from .models import *
 
+#Функция с запросом к бд, без ответного результата.
 def execute_query(sql_query,param = None):
+    with connection.cursor() as cursor:
+        cursor.execute(sql_query,param)
+
+#Функция, которая возвращает результат запроса.
+def execute_query_with_result(sql_query,param = None):
     with connection.cursor() as cursor:
         cursor.execute(sql_query,param)
         result = cursor.fetchall()
@@ -15,17 +21,17 @@ class AuthorsSerializer:
         
     def get_author_list(self):
         sql_query = "SELECT * FROM Authors"
-        result = execute_query(sql_query)
+        result = execute_query_with_result(sql_query)
         return result
         
     def add_author(self,author_name):
         sql_query = "INSERT INTO Authors (author_name) VALUES (%s)"
         param = [author_name]
-        result = execute_query(sql_query,param)
+        result = execute_query_with_result(sql_query,param)
         return result
     
     def delete_author(self,id):
-        sql_query = "DELET FROM Authors WHERE id = %s"
+        sql_query = "DELETE FROM Authors WHERE id = %s"
         param = [id]
         result = execute_query(sql_query,param)
         return result
@@ -40,47 +46,51 @@ class GenresSerializer:
     
     def get_genres(self):
         sql_query = "SELECT * FROM Genres"
-        result = execute_query(sql_query)
+        result = execute_query_with_result(sql_query)
         return result
     
     def add_genre(self,genre):
         sql_query = "INSERT INTO Genres (title) value (%s)"
         param = [genre]
-        result = execute_query(sql_query,param)
+        result = execute_query_with_result(sql_query,param)
         return result
         
 class ReaderSerializer:
     
     def get_readers(self):
         sql_query = "SELECT * FROM Readers"
-        result = execute_query(sql_query)
+        result = execute_query_with_result(sql_query)
         return result
     
     #reader должен иметь имя, и geoJSON.
     def add_reader(self,*reader):
         sql_query = "INSERT INTO Reader (reader_name,adress) VALUES (%s,%s)"
         param = reader
-        result = execute_query(sql_query,param)
+        result = execute_query_with_result(sql_query,param)
         return result
     
     def change_reader(self,id,*reader):
         sql_query = "UPDATE Reader SET reader_name = %s,adress = %s WHERE id = %s"
         param = list(reader)
         param.append(id)
-        result = execute_query(sql_query,param)
-        return result
-   
+        execute_query(sql_query,param)
+        
+    def delete_reader(self,id):
+        sql_query = "DELET FROM Reader  WHERE id = %s"
+        execute_query(sql_query)
+        
+ 
 class BookSerializer:
     
     def get_books(self):
         sql_query = "SELECT * FROM Books"
-        result = execute_query(sql_query)
+        result = execute_query_with_result(sql_query)
         return result
     
     def add_book(self,*book):
         sql_query = "INSERT INTO Books (book_title, genre_id, author_id) VALUES(%s,%s,%s)"
         param = book
-        result = execute_query(sql_query,param)
+        result = execute_query_with_result(sql_query,param)
         return result
     
     def update_book(self,id,*book):
@@ -100,31 +110,51 @@ class EventsSerializer:
     
     def get_events(self):
         sql_query = "SELECT * FROM Events"
-        result = execute_query(sql_query)
+        result = execute_query_with_result(sql_query)
         return result
     
+    #нужно передавать (book_id, reader_id, transaction_date, transaction_expected_return)
     def add_event(self,*event):
-        sql_query = "INSERT INTO Events(book, reader, transaction_date, transaction_return, transaction_expected_return) VALUES(%s,%s,%s,%s,%s) WHERE id = %s"
-        param = event
-        result = execute_query(sql_query,param)
+        sql_query = "BEGIN; INSERT INTO Events(book_id, reader_id, transaction_date, transaction_expected_return) VALUES(%s,%s,%s,%s); UPDATE Books SET isReturned = FALSE WHERE id = %s; COMMIT;"
+        param = list(event)
+        param.append(event[0])
+        result = execute_query_with_result(sql_query,param)
         return result
-        
+    
+    #Передаем только id    
     def close_event(self,id):
-        sql_query = "UPDATE Events SET transaction_return = %s WHERE id = %s"
+        sql_query = "BEGGIN; UPDATE Events SET transaction_return = %s WHERE id = %s; UPDATE Books SET isReturned = FALSE WHERE id = (SELECT book_id FROM Events WHERE id = %s)  COMMIT;"
         current_timestamp = datetime.datetime.now()
-        param = [current_timestamp,id]
+        param = [current_timestamp,id,id]
         result = execute_query(sql_query,param)
         return result
+    
+    
+class ReportSerializer:
     
     def get_non_closed_events(self):
         sql_query = "SELECT * FROM Events WHERE transaction_return = NULL"
-        result = execute_query(sql_query)
+        result = execute_query_with_result(sql_query)
         return result
     
     def get_outdated_non_closed_events(self):
         sql_query = "SELECT * FROM Events WHERE transaction_return = NULL AND transaction_expected_return < %s"
         current_timestamp = datetime.datetime.now()
         param = [current_timestamp]
-        result = execute_query(sql_query,param)
+        result = execute_query_with_result(sql_query,param)
         return result
     
+    def getMostPopularGenres(self):
+        sql_query = "SELECT title, count(title) FROM Genres JOIN Books ON Genres.id = Books.genre_id JOIN Events ON Books.id = Events.book_id group by title"
+        result = execute_query_with_result(sql_query)
+        return result 
+        
+    def getMostPopularAuthors(self):
+        sql_query = "SELECT author_name, count(Authors.id) FROM Authors JOIN Books ON Books.author_id = Authors.id JOIN Events ON Events.book_id = books.id group by (Authors.id)"
+        result = execute_query_with_result(sql_query)
+        return result 
+    
+    def getMostPopularBooks(self):
+        sql_query = "SELECT Books.book_title, count(Events.book_id) FROM Books RIGHT JOIN Events ON Books.id = Events.book_id GROUP BY book_title"
+        result = execute_query_with_result(sql_query)
+        return result 
