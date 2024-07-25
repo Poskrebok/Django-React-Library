@@ -20,7 +20,7 @@ class BookManager(APIView):
         books_serializer = BookSerializer()
         
         if book_title and genre_id and author_id:
-            books_serializer.add_book((book_title,genre_id,author_id))
+            books_serializer.add_book([book_title,genre_id,author_id])
             return Response("Succes",status=status.HTTP_200_OK)
         else:
             return Response("Missing data to create a book", status=status.HTTP_400_BAD_REQUEST)
@@ -202,7 +202,7 @@ class Reports(APIView):
 # Получить/обновить список жанров
 class GenresManager(APIView):
     # Получить список жанров.
-    def get(self):
+    def get(self,request):
         genre_serializer = GenresSerializer()
         genre_list = genre_serializer.get_genres()
         return Response(genre_list)

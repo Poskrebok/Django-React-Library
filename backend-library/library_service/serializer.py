@@ -63,15 +63,15 @@ class ReaderSerializer:
         return result
     
     #reader должен иметь имя, и geoJSON.
-    def add_reader(self,*reader):
+    def add_reader(self,reader):
         sql_query = "INSERT INTO Reader (reader_name,adress) VALUES (%s,%s)"
         param = reader
         result = execute_query_with_result(sql_query,param)
         return result
     
-    def change_reader(self,id,*reader):
+    def change_reader(self,id,reader):
         sql_query = "UPDATE Reader SET reader_name = %s,adress = %s WHERE id = %s"
-        param = list(reader)
+        param = reader
         param.append(id)
         execute_query(sql_query,param)
         
@@ -87,24 +87,21 @@ class BookSerializer:
         result = execute_query_with_result(sql_query)
         return result
     
-    def add_book(self,*book):
+    def add_book(self,book):
         sql_query = "INSERT INTO Books (book_title, genre_id, author_id) VALUES(%s,%s,%s)"
         param = book
-        result = execute_query_with_result(sql_query,param)
-        return result
+        execute_query(sql_query,param)
     
-    def update_book(self,id,*book):
+    def update_book(self,id,book):
         sql_query = "UPDATE Books SET book_title = %s, genre_id = %s, author_id = %s WHERE id = %s"
-        param = list(book)
+        param = book
         param.append(id)
-        result = execute_query(sql_query,param)
-        return result
+        execute_query(sql_query,param)
     
     def remove_book(self,id):
         sql_query = "DELETE FROM Books WHERE id = %s"
         param = [id]
-        result = execute_query(sql_query,param)
-        return result
+        execute_query(sql_query,param)
     
 class EventsSerializer:
     
@@ -114,9 +111,9 @@ class EventsSerializer:
         return result
     
     #нужно передавать (book_id, reader_id, transaction_date, transaction_expected_return)
-    def add_event(self,*event):
+    def add_event(self,event):
         sql_query = "BEGIN; INSERT INTO Events(book_id, reader_id, transaction_date, transaction_expected_return) VALUES(%s,%s,%s,%s); UPDATE Books SET isReturned = FALSE WHERE id = %s; COMMIT;"
-        param = list(event)
+        param = event
         param.append(event[0])
         result = execute_query_with_result(sql_query,param)
         return result
