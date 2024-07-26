@@ -2,7 +2,7 @@ from django.db import models
 
 # Create your models here.
 # Эти модели были созданы через "inspectdb > models.py". 
-
+# По сути они нам не нужны, т.к. все запросы делаем через connection напряму в дб.
 class Authors(models.Model):
     author_name = models.CharField(max_length=100)
 

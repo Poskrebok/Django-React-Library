@@ -40,11 +40,10 @@ const BookProfile = () => {
     id: params.bookid
   });
   const [event, setEvent] = useState({
-    book_id: params.bookid,
     reader_id: '',
-    transaction_expected_return: '',
+    book_id: params.bookid,
+    transaction_expected_return: ''
   });
-  const [transaction_expected_return, setExpectedTime] = useState();
   /* Функция для открытия/зыкрытия модального окна. */
   const toggle = () => setModal(!modal);
   /* Ловлю изменения внесенные в книгу. */
@@ -57,9 +56,9 @@ const BookProfile = () => {
   };
   /* Ловлю изменение времени */
   const handleDateTimeChange = (date) => {
-    setExpectedTime(date);
     setEvent({
-      transaction_expected_return:date
+      ...event,
+      transaction_expected_return: date
     })
   };
   /* Ловлю изменения внесенные в Евент */
@@ -70,8 +69,10 @@ const BookProfile = () => {
       [name]: value
     });
   };
-
+  /* Создаю "событие" т.е. выдаю книгу. */
   const onEventCreate = async () => {
+    console.log(`Event:`, event.book_id)
+    console.log(`Event:`, event.reader_id)
     axios.put(URLS.BOOKEVENTMANAGER, event).then(response => {
       console.log('Success', response);
       history(`/Main/books/`);
@@ -80,6 +81,7 @@ const BookProfile = () => {
     })
   }
 
+  /* Получаю автора по его id */
   const getAuthor = (authorId) => {
     const foundAuthor = Authors.find((author) => author[0] === authorId);
     if (foundAuthor) {
@@ -87,12 +89,15 @@ const BookProfile = () => {
     }
   }
 
+  /* Получаю жанр по его id */
   const getGenre = (genreId) => {
     const foundGenre = genres.find((genre) => genre[0] === genreId);
     if (foundGenre) {
       return foundGenre[1];
     }
   }
+
+  /* Получаю читателя по его id */
   const getReader = (readerId) => {
     const foundReader = Readers.find((reader) => reader[0] === readerId);
     if (foundReader) {
@@ -100,6 +105,8 @@ const BookProfile = () => {
     }
   }
 
+  /* Короче, тут как и везде, просто при загрузке страницы выкачиваем
+  жанры, авторов, читателей. */
   useEffect(() => {
     const fetchData = async () => {
       await axios.get(URLS.GENREMANAGER).then(response => {
@@ -127,6 +134,7 @@ const BookProfile = () => {
     fetchData();
   }, []);
 
+  /* Подтверждаем изменение книги.  */
   const onEditBook = async () => {
     axios.post(URLS.BOOKMANAGMENR, newBook).then(response => {
       console.log('Success', response);
@@ -136,6 +144,7 @@ const BookProfile = () => {
     })
   }
 
+/* Подтверждаем удаление книги.  */
   const onDeleteBook = async () => {
     axios.delete(URLS.BOOKMANAGMENR, { data: { id: newBook.id } }).then(response => {
       console.log('Success', response);
@@ -213,57 +222,59 @@ const BookProfile = () => {
                     </Modal>
                   </Row>
                 </Col>
-                <Row className="py-lg-1">
-                  <UncontrolledDropdown>
-                    <DropdownToggle
-                      caret
-                      color="dark"
-                    >
-                      {getGenre(newBook.genre_id)}
-                    </DropdownToggle>
-                    <DropdownMenu >
-                      {genres.map((genre) => (
-                        <DropdownItem key={genre[0]} onClick={() => handleBookChange({ target: { name: 'genre_id', value: genre[0] } })}>
-                          {genre[1]}
-                        </DropdownItem>
-                      ))}
-                    </DropdownMenu>
-                  </UncontrolledDropdown>
-                </Row>
-                <Row className="py-lg-1">
-                  <UncontrolledDropdown>
-                    <DropdownToggle
-                      caret
-                      color="dark"
-                    >
-                      {getAuthor(newBook.author_id)}
-                    </DropdownToggle>
-                    <DropdownMenu >
-                      {Authors.map((author) => (
-                        <DropdownItem key={author[0]} onClick={() => handleBookChange({ target: { name: 'author_id', value: author[0] } })}>
-                          {author[1]}
-                        </DropdownItem>
-                      ))}
-                    </DropdownMenu>
-                  </UncontrolledDropdown>
-                </Row>
-                <Row className="py-lg-1">
-                  <Col>
-                    <Button color="primary" onClick={onEditBook}>
-                      Save changes
-                    </Button>
-                  </Col>
-                  <Col>
-                    <Button color="danger" onClick={onDeleteBook}>
-                      Delete book
-                    </Button>
-                  </Col>
-                  <Col>
-                    <Button color="primary" onClick={(e) => (history(`/Main/books/`))}>
-                      Return
-                    </Button>
-                  </Col>
-                </Row>
+                <Col>
+                  <Row className="py-lg-1">
+                    <UncontrolledDropdown>
+                      <DropdownToggle
+                        caret
+                        color="dark"
+                      >
+                        {getGenre(newBook.genre_id)}
+                      </DropdownToggle>
+                      <DropdownMenu >
+                        {genres.map((genre) => (
+                          <DropdownItem key={genre[0]} onClick={() => handleBookChange({ target: { name: 'genre_id', value: genre[0] } })}>
+                            {genre[1]}
+                          </DropdownItem>
+                        ))}
+                      </DropdownMenu>
+                    </UncontrolledDropdown>
+                  </Row>
+                  <Row className="py-lg-1">
+                    <UncontrolledDropdown>
+                      <DropdownToggle
+                        caret
+                        color="dark"
+                      >
+                        {getAuthor(newBook.author_id)}
+                      </DropdownToggle>
+                      <DropdownMenu >
+                        {Authors.map((author) => (
+                          <DropdownItem key={author[0]} onClick={() => handleBookChange({ target: { name: 'author_id', value: author[0] } })}>
+                            {author[1]}
+                          </DropdownItem>
+                        ))}
+                      </DropdownMenu>
+                    </UncontrolledDropdown>
+                  </Row>
+                  <Row >
+                    <Col>
+                      <Button color="primary" onClick={onEditBook}>
+                        Save changes
+                      </Button>
+                    </Col>
+                    <Col>
+                      <Button color="danger" onClick={onDeleteBook}>
+                        Delete book
+                      </Button>
+                    </Col>
+                    <Col>
+                      <Button color="primary" onClick={(e) => (history(`/Main/books/`))}>
+                        Return
+                      </Button>
+                    </Col>
+                  </Row>
+                </Col>
               </Form>
             </CardBody>
           </Card>

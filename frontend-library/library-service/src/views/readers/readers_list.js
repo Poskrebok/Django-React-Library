@@ -21,18 +21,18 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { URLS } from "../../url";
 
-
+/* Функция, создающая форму с таблицей читателей. Позволяет заходить в карточку читателя */
 const ReadersList = () => {
   const [readers, setReaders] = useState([]);
   const [newReader, setNewReader] = useState({
     reader_name: '',
     adress: ''
-  });
+  }); /* Форма пользователя, жалко, что с адресом не успел. */
   const [modal, setModal] = useState(false);
   const toggle = () => setModal(!modal);
 
   const history = useNavigate();
-
+  /* Функция, которая обрабатывает нажатие на строку. */
   const handleRowClick = (readerId, readerName, readerAdress) => {
     history(`/Main/readers/${readerId}`, {
       state: {
@@ -41,7 +41,7 @@ const ReadersList = () => {
       }
     });
   };
-
+  /* Функция, которая ловит изменения для создания нового читателя. */
   const handleChange = (e) => {
     const { name, value } = e.target;
     setNewReader({
@@ -49,7 +49,7 @@ const ReadersList = () => {
       [name]: value
     });
   };
-
+  /* Окончательно создает нового пользователя. */
   const handleReaderCreate = async (e) => {
     console.log(newReader);
     await axios.put(URLS.READERMANAGER, newReader).then(response => {
@@ -58,7 +58,9 @@ const ReadersList = () => {
       console.error('Error', err);
     })
   }
-
+  /* useEffect вызывается каждый раз при загрузке страницы(в данном случае).
+   Выкачивает список читателей.
+  */
   useEffect(() => {
     const fetchData = async () => {
       await axios.get(URLS.READERMANAGER).then(response => {

@@ -1,6 +1,21 @@
 import { useNavigate } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, CardHeader, CardBody, Button, CardTitle } from "reactstrap";
+import {
+    Container,
+    Row,
+    Col,
+    Card,
+    CardHeader,
+    CardBody,
+    Button,
+    Label,
+    Input,
+    Table,
+    Modal,
+    ModalHeader,
+    ModalBody,
+    ModalFooter
+} from "reactstrap";
 import axios from 'axios';
 import { URLS } from '../../url';
 
@@ -10,42 +25,72 @@ const ReportsPage = () => {
     const [reports, setReports] = useState([]);
     const navigate = useNavigate();
     const [books, setBooks] = useState([]);
-    const [genres, setGenres] = useState([]);
-    const [Authors, setAuthors] = useState([]);
+    const [readers, setReader] = useState([]);
+    const [reportType, setReportType] = useState(`activeEvents`)
+    /* Функции необходимые для работоспособности всплывающего окна. */
+    const [modal, setModal] = useState(false);
+    const [choosenId, setId] = useState();
+    const toggle = () => setModal(!modal);
+    /* Функция, закрывающая "событие" */
+    const closeEvent = async () => {
+        await axios.post(URLS.BOOKEVENTMANAGER, { id: choosenId }).then(response => {
+            console.log('Event closing', response);
+        }).catch(err => {
+            console.error('Error', err);
+        })
+    }
+    /* Функция, которая меняет тип отображаемых отчетов. */
+    const changeReportType = () => {
+        reportType === `activeEvents` ?
+            setReportType(`debtEvents`) :
+            setReportType(`activeEvents`);
+    }
 
+    /* Функция, которая возвращает название книги по его id */
+    const getBook = (bookId) => {
+        const founBook = books.find((book) => book[0] === bookId);
+        if (founBook) {
+            return founBook[1];
+        }
+    }
+
+    /* Функция, которая возвращает имя читателя по его id */
+    const getReader = (readerId) => {
+        const foundReader = readers.find((reader) => reader[0] === readerId);
+        if (foundReader) {
+            return foundReader[1];
+        }
+    }
+
+    /* Здесь пришлось сделать через ссылку с параметром, т.к. get запрос не может отправлять данные. */
+    const loadData = async () => {
+        await axios.get(`${URLS.REPORTS}${reportType}`).then(response => {
+            console.log('Reciving reports', response);
+            setReports(response.data);
+        }).catch(err => {
+            console.error('Error', err);
+        })
+    }
+
+    /* Выгрузка данных при первом заходе на страницу.(и при изменении параметра reportType) */
     useEffect(() => {
         const fetchData = async () => {
-            await axios.get(URLS.REPORTS,{'report_type':'activeEvents'}).then(response => {
-                console.log('Reciving books', response);
-                setBooks(response.data);
-                console.log(response.data)
-            }).catch(err => {
-                console.error('Error', err);
-            })
+            loadData();
             await axios.get(URLS.BOOKMANAGMENR).then(response => {
                 console.log('Reciving books', response);
                 setBooks(response.data);
-                console.log(response.data)
             }).catch(err => {
                 console.error('Error', err);
             })
-            await axios.get(URLS.GENREMANAGER).then(response => {
+            await axios.get(URLS.READERMANAGER).then(response => {
                 console.log('Reciving Genres', response);
-                setGenres(response.data);
-                console.log(response.data)
-            }).catch(err => {
-                console.error('Error', err);
-            })
-            await axios.get(URLS.AUTHORMANAGER).then(response => {
-                console.log('Reciving authors', response);
-                setAuthors(response.data);
-                console.log(response.data)
+                setReader(response.data);
             }).catch(err => {
                 console.error('Error', err);
             })
         };
         fetchData();
-    }, []);
+    }, [reportType]);
 
 
     return (
@@ -57,17 +102,57 @@ const ReportsPage = () => {
                     <Col lg="8">
                         <Card>
                             <CardHeader>
-                                <h3>Reports page</h3>
+                                <Col>
+                                    <Row>
+                                        <h3>Reports page</h3>
+                                    </Row>
+                                    <Label check>
+                                        <Input type="checkbox" checked={reportType === 'debtEvents'} onChange={() => {
+                                            changeReportType();
+                                        }} />{' '}
+                                        Show only outdated events
+                                    </Label>
+                                </Col>
                             </CardHeader>
                             <CardBody>
-                            
+                                <Table className="align-items-center table-flush" responsive>
+                                    <thead className="thead-light">
+                                        <tr>
+                                            <th scope="col">Book name</th>
+                                            <th scope="col">Holder</th>
+                                            <th scope="col">Date of issue</th>
+                                            <th scope="col">Expected return</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {reports.map((report) => (
+                                            <tr key={report[0]} onClick={() => {
+                                                setId(report[0]);
+                                                toggle();
+                                            }} style={{ cursor: 'pointer' }}>
+                                                <th scope="col">{getBook(report[1])}</th>
+                                                <th scope="col">{getReader(report[2])}</th>
+                                                <th scope="col">{new Date(report[3]).toLocaleString()}</th>
+                                                <th scope="col">{new Date(report[5]).toLocaleString()}</th>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </Table>
+                                <Modal isOpen={modal} toggle={toggle}>
+                                    <ModalHeader toggle={toggle}>Modal Title</ModalHeader>
+                                    <ModalBody>
+                                        Are you sure that book is alright and ready to be returned
+                                    </ModalBody>
+                                    <ModalFooter>
+                                        <Button color="primary" onClick={() => {
+                                            closeEvent();
+                                            toggle();
+                                        }}>Yes</Button>
+                                        <Button color="secondary" onClick={toggle}>No</Button>
+                                    </ModalFooter>
+                                </Modal>
                             </CardBody>
                         </Card>
-                        <Row className="d-flex justify-content-center">
-                            <Col lg="6" xl="4">
-
-                            </Col>
-                        </Row>
                     </Col>
                 </Row>
             </Container>

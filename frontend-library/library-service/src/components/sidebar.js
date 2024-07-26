@@ -1,35 +1,16 @@
-import { useContext, useState } from 'react';
-import { NavLink as NavLinkRRD, Link, useParams } from "react-router-dom";
+import { useState } from 'react';
+import { NavLink as NavLinkRRD} from "react-router-dom";
 import {
-    Button,
-    Card,
-    CardHeader,
-    CardBody,
-    CardTitle,
     Collapse,
-    DropdownMenu,
-    DropdownItem,
-    UncontrolledDropdown,
-    DropdownToggle,
-    FormGroup,
     Form,
-    Input,
-    InputGroupText,
-    InputGroup,
-    Media,
-    NavbarBrand,
     Navbar,
     NavItem,
     NavLink,
     Nav,
-    Progress,
-    Table,
     Container,
-    Row,
-    Col,
 } from "reactstrap";
 import { PropTypes } from "prop-types";
-
+/* Название говорит само за себя.*/
 const Sidebar = (props) => {
     const [collapseOpen, setCollapseOpen] = useState();
     const activeRoute = (routeName) => {
@@ -41,6 +22,7 @@ const Sidebar = (props) => {
     const closeCollapse = () => {
         setCollapseOpen(false);
     };
+    /* Создаем ссылки, из routes. Берем только те, что не (aux) */
     const createLinks = (routes) => {
         return routes.map((prop, key) => {
             if ((!(prop.filter === "aux")))
@@ -78,7 +60,7 @@ const Sidebar = (props) => {
                     {/* Navigation */}
                     <Nav className="mb-md-3" navbar>
                         <NavItem>
-                            <NavLink href="https://github.com/Poskrebok/Django-react-coursesmanager">
+                            <NavLink href="https://github.com/Poskrebok/Django-React-Library">
                                 <i className="ni ni-spaceship" />
                                 Repository
                             </NavLink>

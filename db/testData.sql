@@ -31,3 +31,25 @@ BEGIN
         i := i + 1;
     END LOOP;
 END $$;
+
+
+BEGIN; 
+INSERT INTO Events(book_id, reader_id, transaction_expected_return)
+ VALUES(1,1,'2024-07-26 15:30:00'); 
+ UPDATE Books SET isReturned = FALSE 
+ WHERE id = 1; 
+ COMMIT;
+
+ BEGIN; 
+INSERT INTO Events(book_id, reader_id, transaction_expected_return)
+ VALUES(2,1,'2024-07-28 15:30:00'); 
+ UPDATE Books SET isReturned = FALSE 
+ WHERE id = 2; 
+ COMMIT;
+
+  BEGIN; 
+INSERT INTO Events(book_id, reader_id, transaction_expected_return)
+ VALUES(3,2,'2024-07-28 15:30:00'); 
+ UPDATE Books SET isReturned = FALSE 
+ WHERE id = 3; 
+ COMMIT;

@@ -3,8 +3,10 @@ from django.db import connection
 import datetime
 
 from .models import *
+#Все запросы к БД - здесь!!!
 
-#Функция с запросом к бд, без ответного результата.
+#Функция с запросом к бд, без ответного результата.(Если у нас отсутствует ответный результат, то выкидывается ошибка, 
+# что создает некоторые проблемы при запросах, которые не должны ничего возвращать.)
 def execute_query(sql_query,param = None):
     with connection.cursor() as cursor:
         cursor.execute(sql_query,param)
@@ -109,58 +111,61 @@ class EventsSerializer:
         result = execute_query_with_result(sql_query)
         return result
     
-    #нужно передавать (book_id, reader_id, transaction_date, transaction_expected_return)
+    #нужно передавать (book_id, reader_id, transaction_expected_return)
     def add_event(self,event):
         sql_query = "BEGIN; INSERT INTO Events(book_id, reader_id, transaction_expected_return) VALUES(%s,%s,%s); UPDATE Books SET isReturned = FALSE WHERE id = %s; COMMIT;"
         param = event
         param.append(event[0])
-        result = execute_query_with_result(sql_query,param)
-        return result
+        execute_query(sql_query,param)
     
     #Передаем только id    
     def close_event(self,id):
-        sql_query = "BEGGIN; UPDATE Events SET transaction_return = %s WHERE id = %s; UPDATE Books SET isReturned = FALSE WHERE id = (SELECT book_id FROM Events WHERE id = %s)  COMMIT;"
+        sql_query = "BEGIN; UPDATE Events SET transaction_return = %s WHERE id = %s; UPDATE Books SET isReturned = TRUE WHERE id = (SELECT book_id FROM Events WHERE id = %s);  COMMIT;"
         current_timestamp = datetime.datetime.now()
         param = [current_timestamp,id,id]
-        result = execute_query(sql_query,param)
-        return result
+        execute_query(sql_query,param)
     
     
 class ReportSerializer:
-    
+    # Получить все незакрытые события
     def get_non_closed_events(self):
-        sql_query = "SELECT * FROM Events WHERE transaction_return = NULL"
+        sql_query = "SELECT * FROM Events WHERE transaction_return IS NULL"
         result = execute_query_with_result(sql_query)
         return result
     
+    # Получить все незакрытые просроченные события
     def get_outdated_non_closed_events(self):
-        sql_query = "SELECT * FROM Events WHERE transaction_return = NULL AND transaction_expected_return < %s"
+        sql_query = "SELECT * FROM Events WHERE transaction_return IS NULL AND transaction_expected_return < %s"
         current_timestamp = datetime.datetime.now()
         param = [current_timestamp]
         result = execute_query_with_result(sql_query,param)
         return result
     
+    # Получить список жанров по популярности
     def getMostPopularGenres(self):
-        sql_query = "SELECT title, count(title) FROM Genres JOIN Books ON Genres.id = Books.genre_id JOIN Events ON Books.id = Events.book_id group by title"
-        result = execute_query_with_result(sql_query)
-        return result 
-        
-    def getMostPopularAuthors(self):
-        sql_query = "SELECT author_name, count(Authors.id) FROM Authors JOIN Books ON Books.author_id = Authors.id JOIN Events ON Events.book_id = books.id group by (Authors.id)"
+        sql_query = "SELECT title, count(title) FROM Genres JOIN Books ON Genres.id = Books.genre_id JOIN Events ON Books.id = Events.book_id group by title ORDER BY COUNT(title) DESC;"
         result = execute_query_with_result(sql_query)
         return result 
     
+    #Получить список авторов по популярности
+    def getMostPopularAuthors(self):
+        sql_query = "SELECT author_name, count(Authors.id) FROM Authors JOIN Books ON Books.author_id = Authors.id JOIN Events ON Events.book_id = books.id group by (Authors.id) ORDER BY COUNT(Authors.id) DESC;"
+        result = execute_query_with_result(sql_query)
+        return result 
+    
+    #Получить список книг по популярности(не используется)
     def getMostPopularBooks(self):
         sql_query = "SELECT Books.book_title, count(Events.book_id) FROM Books RIGHT JOIN Events ON Books.id = Events.book_id GROUP BY book_title"
         result = execute_query_with_result(sql_query)
         return result 
     
+    #Получить статистику по читателю.
     def getReaderProfileData(self,reader_id):
-        param = reader_id
+        param = [reader_id]
         sql_query_taken = "SELECT Count(*) FROM Events WHERE reader_id = %s"
         sql_query_debt = "SELECT Count(*) FROM Events WHERE reader_id = %s AND transaction_return = NULL"
-        sql_query_last_visit = ""
-        sql_query_favorite_genre = ""
+        sql_query_last_visit = "SELECT GREATEST(transaction_date, transaction_return) AS latest_date FROM (SELECT * FROM events WHERE reader_id = %s);"
+        sql_query_favorite_genre = "SELECT title, count(title) FROM Genres JOIN Books ON Genres.id = Books.genre_id JOIN Events ON Books.id = Events.book_id  WHERE reader_id = %s group by title ORDER BY COUNT(title) DESC;"
         result = []
         try:
             result.append(execute_query_with_result(sql_query_taken,param))
@@ -175,7 +180,7 @@ class ReportSerializer:
         except:
             result.append([0])
         try:
-            result.append(execute_query_with_result(sql_query_last_visit,param))
+            result.append(execute_query_with_result(sql_query_favorite_genre,param))
         except:
             result.append([0])
         return result

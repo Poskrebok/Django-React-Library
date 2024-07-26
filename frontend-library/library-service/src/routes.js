@@ -2,20 +2,13 @@ import { React } from 'react';
 import ReportsPage from './views/reports/reports';
 import ReadersList from './views/readers/readers_list';
 import BookList from './views/books/books_list';
-import Main from './views/main';
 import AuthorList from './views/Authors/author_list';
 import BookProfile from './views/books/book_profile';
 import ReaderProfile from './views/readers/reader_profile';
 import AuthorProfile from './views/Authors/author_profile';
+import Statistic from './views/reports/statistic';
 var routes = [
-    {
-        path: "/main",
-        name: "Main",
-        icon: "ni ni-book-bookmark text-black ",
-        layout: "/Main",
-        filter: "main",
-        component: <Main/>
-    },
+
     {
         path: "/books",
         name: "Books",
@@ -47,6 +40,14 @@ var routes = [
         layout: "/Main",
         filter: "main",
         component: <ReportsPage/>
+    },
+    {
+        path: "/statistic",
+        name: "Statistic",
+        icon: "ni ni-chart-pie-35 text-red",
+        layout: "/Main",
+        filter: "main",
+        component: <Statistic/>
     },
     {
         path: "/readers/:readerid",

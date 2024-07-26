@@ -1,23 +1,19 @@
 import {
     Container,
     Card,
-    CardHeader,
     Row,
     Col,
     Button,
     Input,
     CardBody,
     Form,
-    DropdownToggle,
-    DropdownMenu,
-    UncontrolledDropdown,
-    DropdownItem
 } from "reactstrap";
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { useState, useEffect } from "react";
 import { URLS } from "../../url";
 import axios from "axios";
 
+/*Профиль читателя: данная функция обеспечивает нас информацией об предпочтениях читателя, а так же позвояляет провести некоторые изменения в нем */
 const ReaderProfile = () => {
     const history = useNavigate();
     const location = useLocation();
@@ -27,13 +23,14 @@ const ReaderProfile = () => {
         books_taken: '',
         debt: '',
         last_visit: '',
-        fav_genre: ''
-    })
+        fav_genre: []
+    })/* Форма статистических данных по читателю */
     const [newReader, setNewReader] = useState({
         reader_name: location.state.reader_name,
         adress: location.state.adress,
         id: params.readerid
-    });
+    });/* Форма для смены параметров читателя.  */
+    /* Данная функция ловит изменения, которые ввел пользователь в полях. */
     const handleChange = (e) => {
         const { name, value } = e.target;
         setNewReader({
@@ -42,6 +39,7 @@ const ReaderProfile = () => {
         });
     };
 
+    /* Функция возвращающая имя жанра по его id */
     const getGenre = (genreId) => {
         const foundGenre = genres.find((genre) => genre[0] === genreId);
         if (foundGenre) {
@@ -49,6 +47,8 @@ const ReaderProfile = () => {
         }
     }
 
+    /* Функция, которая загрузке страницы выкачивает необходимые данные с эндпоинтов(Жанры и Авторы)  
+    Нам это нужно, т.к. в статистике мы получаем id жанра и автора, а не их имена*/
     useEffect(() => {
         const fetchData = async () => {
             await axios.get(URLS.GENREMANAGER).then(response => {
@@ -58,13 +58,13 @@ const ReaderProfile = () => {
             }).catch(err => {
                 console.error('Error', err);
             });
-            await axios.get(URLS.READERPROFILE).then(response => {
-                console.log('Reciving Genres', response);
+            await axios.get(`${URLS.READERPROFILE}${newReader.id}`).then(response => {
+                console.log('Reciving reader profile', response);
                 setProfile({
                     books_taken: response.data[0],
                     debt: response.data[1],
                     last_visit: response.data[2],
-                    fav_genre: getGenre(response.data[3]),
+                    fav_genre: response.data[3],
                 })
                 console.log(response.data)
             }).catch(err => {
@@ -73,6 +73,8 @@ const ReaderProfile = () => {
         };
         fetchData();
     }, []);
+
+    /* Функция, утверждающая внесенные нами изменения в читателя. Отпровляет все на сервер. */
     const onEditReader = async () => {
         axios.post(URLS.READERMANAGER, newReader).then(response => {
             console.log('Success', response);
@@ -82,6 +84,7 @@ const ReaderProfile = () => {
         })
     }
 
+    /* Удаляет нашего читателя. Скорее всего работать не будет если на него есть записи в событиях.*/
     const onDeleteReader = async () => {
         axios.delete(URLS.READERMANAGER, { data: { id: newReader.id } }).then(response => {
             console.log('Success', response);
@@ -120,10 +123,10 @@ const ReaderProfile = () => {
                                     Books in debt: {profile.debt}
                                 </Row>
                                 <Row className="py-lg-1">
-                                    Favorite genre: {getGenre(profile.fav_genre)}
+                                    Favorite genre: {(profile.fav_genre[0])}
                                 </Row>
                                 <Row className="py-lg-1">
-                                    Last visit: {profile.last_visit}
+                                    Last visit: {profile.last_visit.toString()}
                                 </Row>
                                 <Row className="py-lg-1">
                                     <Col>

@@ -77,7 +77,7 @@ class AuthorManager(APIView):
         else:
             return Response("Author ID or name missing", status=status.HTTP_400_BAD_REQUEST)
         
-    
+    #Удалить автора
     def delete(self, request):
         author_id = request.data.get('author_id', None)
         if author_id:
@@ -147,7 +147,7 @@ class BookEventManager(APIView):
         events_serializer = EventsSerializer()
         
         if all([book_id, reader_id, transaction_expected_return]):
-            result = events_serializer.add_event(book_id, reader_id, transaction_expected_return)
+            result = events_serializer.add_event([book_id, reader_id, transaction_expected_return])
             return Response(result)
         else:
             return Response("Missing data to add an event", status=status.HTTP_400_BAD_REQUEST)
@@ -166,35 +166,41 @@ class BookEventManager(APIView):
 # Отчеты
 class Reports(APIView):
     #report_type - это тип отчета, что мы хотим посмотреть.
-    def get(self,request):
-        report_type = request.data.get('report_type',None)
-        return self.switch[report_type]()
+    def get(self, request, report_type):
+        funct = self.switch.get(report_type)
+        result = funct(self)
+        return result
     
-    def get_genres(self,request):
+    #Получить список по популярности жанров
+    def get_genres(self):
         report_serializer = ReportSerializer()
         author_list = report_serializer.getMostPopularGenres()
         return Response(author_list)
     
-    def get_authors(self,request):
+    #Получить список по популярности авторов.
+    def get_authors(self):
         report_serializer = ReportSerializer()
         author_list = report_serializer.getMostPopularAuthors()
         return Response(author_list)
     
-    def get_events(self,request):
+    #Получить список событий
+    def get_events(self):
         report_serializer = ReportSerializer()
         event_list = report_serializer.get_non_closed_events()
         return Response(event_list)
     
-    def debt_events(self,request):
+    #Получить список событий(Просроченых)
+    def debt_events(self):
         report_serializer = ReportSerializer()
         event_list = report_serializer.get_outdated_non_closed_events()
         return Response(event_list)
     
+    #Case Switch курильщика
     switch = {
-        "popGenres": get_genres,
-        "popAuthor": get_authors,
-        "activeEvents": get_events,
-        "debtEvents": debt_events
+        'popGenres': get_genres,
+        'popAuthor': get_authors,
+        'activeEvents': get_events,
+        'debtEvents': debt_events
     }
     
 # Получить/обновить список жанров
@@ -205,6 +211,7 @@ class GenresManager(APIView):
         genre_list = genre_serializer.get_genres()
         return Response(genre_list)
     
+    # Добавить жанр.
     def put(self,request):
         title = request.data.get('genre',None)
         genre_serializer = GenresSerializer()
@@ -214,8 +221,7 @@ class GenresManager(APIView):
 
 #Класс, который возвращает данные по конкретному читателю.
 class ReaderProfile(APIView):
-    def get(self, request):
-        reader_id = request.data.get('reader_id',None)
+    def get(self, request, reader_id):
         report_serializer = ReportSerializer()
         result = report_serializer.getReaderProfileData(reader_id)
         return Response(result)

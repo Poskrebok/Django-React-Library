@@ -10,23 +10,26 @@ import {
   Modal, ModalFooter,
   ModalHeader, ModalBody
 } from "reactstrap"
-
+/* Функция реализующая отображение таблицы с авторами,
+ а так же переход к "профилю" автора и его созданию
+ */
 const AuthorList = () => {
   const [authors, setAuthor] = useState([]);
   const [authorName, setAuthorName] = useState();
-
   const [modal, setModal] = useState(false);
   const toggleCreateAuthor = () => setModal(!modal);
 
 
   const history = useNavigate();
 
+  /* Обработка нажатия на строку */
   const handleRowClick = (Id, stringValue) => {
     history(`/Main/authors/${Id}`, {
       state: { stringValue: stringValue }
     })
   };
 
+  /* Получить список авторов. */
   useEffect(() => {
     const fetchData = async () => {
       const response = await axios.get(URLS.AUTHORMANAGER).then(response => {
@@ -40,6 +43,7 @@ const AuthorList = () => {
     fetchData();
   }, []);
 
+  /* Создать автора и отправить его на сервер в БД. */
   const handleAuthorCreate = async (author_name) => {
     if (!author_name)
       return;
@@ -59,14 +63,12 @@ const AuthorList = () => {
         <Row>
           <div className="col">
             <Card className="shadow">
+            <CardHeader className="border-0">
               <Row>
                 <Col lg="10">
-                  <CardHeader className="border-0">
                     <h3 className="mb-0">Authors</h3>
-                  </CardHeader>
                 </Col>
                 <Col >
-                  <CardHeader className="border-0">
                     <Button color="primary" onClick={toggleCreateAuthor}>Add author</Button>
                     <Modal isOpen={modal} toggle={toggleCreateAuthor}>
                       <ModalHeader toggle={toggleCreateAuthor}>Enter Author Name</ModalHeader>
@@ -88,9 +90,9 @@ const AuthorList = () => {
                         <Button color="Cancel" onClick={toggleCreateAuthor}>Cancel</Button>
                       </ModalFooter>
                     </Modal>
-                  </CardHeader>
                 </Col>
               </Row>
+              </CardHeader>
               <Table className="align-items-center table-flush" responsive>
                 <thead className="thead-light">
                   <tr>

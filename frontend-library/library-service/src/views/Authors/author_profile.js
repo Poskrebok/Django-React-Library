@@ -5,7 +5,8 @@ import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { URLS } from "../../url";
 import { Button, Form, FormGroup, Label, Input, Modal, ModalHeader, ModalBody, ModalFooter, Row, Card, Col } from 'reactstrap';
 
-/* { authorName, onEditAuthor, onDeleteAuthor } */
+/* Функция, реализующая функции по редактированию автора и его удалению, 
+а также отрисовку окна профиля  */
 const AuthorProfile = () => {
     const location = useLocation();
     const authorName = location.state.stringValue;
@@ -14,6 +15,7 @@ const AuthorProfile = () => {
     const [modal, setModal] = useState(false);
     const [newAuthorName, setAuthorName] = useState(authorName);
 
+    /* Функция, реализующая обработку изменений автора и отправку этих изменений на сервер. */
     const onEditAuthor = async () => {
         const author_id = params.authorid;
         const author_name = newAuthorName;
@@ -25,6 +27,7 @@ const AuthorProfile = () => {
         })
     }
 
+    /* Функция, реализующая удаление автора. */
     const onDeleteAuthor = async () => {
         const author_id = params.authorid;
         axios.delete(URLS.AUTHORMANAGER, { data: { author_id: author_id } }).then(response => {
@@ -35,8 +38,11 @@ const AuthorProfile = () => {
         })
     }
 
+    /* Необходимое зло для работы всплывающих окон. */
     const toggle = () => setModal(!modal);
 
+    /* Функция, вызываемая из формы, сохраняет изменения 
+    в авторе и выкидывет нас на предыдущую страницу */
     const handleSave = () => {
         onEditAuthor(newAuthorName);
         toggle();

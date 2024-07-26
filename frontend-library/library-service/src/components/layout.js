@@ -1,7 +1,5 @@
 import React from "react";
-import { useEffect } from "react";
 import { useLocation, Route, Routes, Navigate, useNavigate } from "react-router-dom";
-import { Container } from "reactstrap";
 
 import Sidebar from "./sidebar.js";
 import LayoutNavbar from "./layoutnavbar.js";
@@ -10,13 +8,13 @@ import routes from "../routes.js";
 const Layout = (props) => {
     const mainContent = React.useRef(null);
     const location = useLocation();
-
+    /* Ну, это нам нужно для прокрути, вроде */
     React.useEffect(() => {
         document.documentElement.scrollTop = 0;
         document.scrollingElement.scrollTop = 0;
         mainContent.current.scrollTop = 0;
     }, [location]);
-
+    /* Функция для получения ссылок */
     const getRoutes = (routes) => {
         return routes.map((prop, key) => {
             return (
