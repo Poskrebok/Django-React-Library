@@ -15,7 +15,7 @@ const ReportsPage = () => {
 
     useEffect(() => {
         const fetchData = async () => {
-            await axios.get(URLS.REPORTS).then(response => {
+            await axios.get(URLS.REPORTS,{'report_type':'activeEvents'}).then(response => {
                 console.log('Reciving books', response);
                 setBooks(response.data);
                 console.log(response.data)
@@ -60,7 +60,7 @@ const ReportsPage = () => {
                                 <h3>Reports page</h3>
                             </CardHeader>
                             <CardBody>
-
+                            
                             </CardBody>
                         </Card>
                         <Row className="d-flex justify-content-center">
