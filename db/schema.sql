@@ -1,6 +1,4 @@
 
-CREATE EXTENSION IF NOT EXISTS postgis;
-
 CREATE TABLE Authors (
   id SERIAL PRIMARY KEY,
   author_name VARCHAR(100) NOT NULL
@@ -23,8 +21,7 @@ CREATE TABLE Books (
 
 CREATE TABLE Readers (
   id SERIAL PRIMARY KEY,
-  reader_name VARCHAR(100) NOT NULL,
-  adress GEOMETRY(Geometry, 4326) DEFAULT NULL
+  reader_name VARCHAR(100) NOT NULL
 );
 
 CREATE TABLE Events (
