@@ -9,9 +9,17 @@ import ReaderProfile from './views/readers/reader_profile';
 import AuthorProfile from './views/Authors/author_profile';
 var routes = [
     {
+        path: "/main",
+        name: "Main",
+        icon: "ni ni-book-bookmark text-black ",
+        layout: "/Main",
+        filter: "main",
+        component: <Main/>
+    },
+    {
         path: "/books",
         name: "Books",
-        icon: "ni ni-book-bookmark text-info ",
+        icon: "ni ni-books text-info ",
         layout: "/Main",
         filter: "main",
         component: <BookList/>

@@ -34,7 +34,7 @@ class BookManager(APIView):
         books_serializer = BookSerializer()
         
         if book_id and book_title and genre_id and author_id:
-            books_serializer.update_book(book_id, book_title, genre_id, author_id)
+            books_serializer.update_book(book_id, [book_title, genre_id, author_id])
             return Response("Succes",status=status.HTTP_200_OK)
         else:
             return Response("Missing data to update the book", status=status.HTTP_400_BAD_REQUEST)
@@ -48,7 +48,7 @@ class BookManager(APIView):
             return Response("Succes",status=status.HTTP_200_OK)
         else:
             return Response("Missing book ID to delete", status=status.HTTP_400_BAD_REQUEST)
-    
+# Осуществляет прием запросана Добавление/Удаление/Изменение автора
 class AuthorManager(APIView):
     #Получаю лист кортежей со всеми записями
     def get(self, request):
@@ -100,9 +100,9 @@ class ReaderManager(APIView):
         reader_name = request.data.get('reader_name', None)
         address = request.data.get('address', None)  
         reader_serializer = ReaderSerializer()
-        
-        if reader_name and address:
-            reader_serializer.add_reader(reader_name, address)
+        #Проверяю только имя, т.к. на адресс(geoJSON) не хватило времени.
+        if reader_name:
+            reader_serializer.add_reader([reader_name, address])
             return Response("Succes",status=status.HTTP_200_OK)
         else:
             return Response("Missing data to create a reader", status=status.HTTP_400_BAD_REQUEST)
@@ -143,13 +143,11 @@ class BookEventManager(APIView):
     def put(self, request):
         book_id = request.data.get('book_id', None)
         reader_id = request.data.get('reader_id', None)
-        transaction_date = request.data.get('transaction_date', None)
-        transaction_return = request.data.get('transaction_return', None)
         transaction_expected_return = request.data.get('transaction_expected_return', None)
         events_serializer = EventsSerializer()
         
-        if all([book_id, reader_id, transaction_date, transaction_expected_return]):
-            result = events_serializer.add_event(book_id, reader_id, transaction_date, transaction_expected_return)
+        if all([book_id, reader_id, transaction_expected_return]):
+            result = events_serializer.add_event(book_id, reader_id, transaction_expected_return)
             return Response(result)
         else:
             return Response("Missing data to add an event", status=status.HTTP_400_BAD_REQUEST)
@@ -213,4 +211,12 @@ class GenresManager(APIView):
         if title:
             genre_serializer.add_genre(title)
             return Response("Succes",status=status.HTTP_200_OK)
+
+#Класс, который возвращает данные по конкретному читателю.
+class ReaderProfile(APIView):
+    def get(self, request):
+        reader_id = request.data.get('reader_id',None)
+        report_serializer = ReportSerializer()
+        result = report_serializer.getReaderProfileData(reader_id)
+        return Response(result)
     

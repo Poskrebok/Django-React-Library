@@ -1,8 +1,5 @@
 from django.urls import path, include, re_path
-from .views import (
-    BookManager, AuthorManager, ReaderManager, BookEventManager,
-    Reports, GenresManager
-)
+from .views import *
 
 urlpatterns = [
     path('book-manager/', BookManager.as_view(), name='book_manager'),
@@ -11,4 +8,5 @@ urlpatterns = [
     path('genre-manager/', GenresManager.as_view(), name='genre_manager'),
     path('book-event-manager/', BookEventManager.as_view(), name='book_event_manager'),
     path('reports/', Reports.as_view(), name='reports'),
+    path('reader-profile/',ReaderProfile.as_view, name='reader_profile'),
 ]

@@ -1,11 +1,52 @@
 import { useNavigate } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, CardHeader, CardBody, Button, CardTitle } from "reactstrap";
+import axios from 'axios';
+import { URLS } from '../../url';
+
 
 /* Данная функция отвечает за создания страницы, отображающая отчеты. */
 const ReportsPage = () => {
     const [reports, setReports] = useState([]);
     const navigate = useNavigate();
+    const [books, setBooks] = useState([]);
+    const [genres, setGenres] = useState([]);
+    const [Authors, setAuthors] = useState([]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            await axios.get(URLS.REPORTS).then(response => {
+                console.log('Reciving books', response);
+                setBooks(response.data);
+                console.log(response.data)
+            }).catch(err => {
+                console.error('Error', err);
+            })
+            await axios.get(URLS.BOOKMANAGMENR).then(response => {
+                console.log('Reciving books', response);
+                setBooks(response.data);
+                console.log(response.data)
+            }).catch(err => {
+                console.error('Error', err);
+            })
+            await axios.get(URLS.GENREMANAGER).then(response => {
+                console.log('Reciving Genres', response);
+                setGenres(response.data);
+                console.log(response.data)
+            }).catch(err => {
+                console.error('Error', err);
+            })
+            await axios.get(URLS.AUTHORMANAGER).then(response => {
+                console.log('Reciving authors', response);
+                setAuthors(response.data);
+                console.log(response.data)
+            }).catch(err => {
+                console.error('Error', err);
+            })
+        };
+        fetchData();
+    }, []);
+
 
     return (
         <>
@@ -19,12 +60,12 @@ const ReportsPage = () => {
                                 <h3>Reports page</h3>
                             </CardHeader>
                             <CardBody>
-                                <p>This is page made for reports</p>
+
                             </CardBody>
                         </Card>
                         <Row className="d-flex justify-content-center">
                             <Col lg="6" xl="4">
-                            
+
                             </Col>
                         </Row>
                     </Col>

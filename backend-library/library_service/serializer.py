@@ -64,10 +64,9 @@ class ReaderSerializer:
     
     #reader должен иметь имя, и geoJSON.
     def add_reader(self,reader):
-        sql_query = "INSERT INTO Reader (reader_name,adress) VALUES (%s,%s)"
+        sql_query = "INSERT INTO Readers (reader_name,adress) VALUES (%s,%s)"
         param = reader
-        result = execute_query_with_result(sql_query,param)
-        return result
+        execute_query(sql_query,param)
     
     def change_reader(self,id,reader):
         sql_query = "UPDATE Reader SET reader_name = %s,adress = %s WHERE id = %s"
@@ -112,7 +111,7 @@ class EventsSerializer:
     
     #нужно передавать (book_id, reader_id, transaction_date, transaction_expected_return)
     def add_event(self,event):
-        sql_query = "BEGIN; INSERT INTO Events(book_id, reader_id, transaction_date, transaction_expected_return) VALUES(%s,%s,%s,%s); UPDATE Books SET isReturned = FALSE WHERE id = %s; COMMIT;"
+        sql_query = "BEGIN; INSERT INTO Events(book_id, reader_id, transaction_expected_return) VALUES(%s,%s,%s); UPDATE Books SET isReturned = FALSE WHERE id = %s; COMMIT;"
         param = event
         param.append(event[0])
         result = execute_query_with_result(sql_query,param)
@@ -155,3 +154,29 @@ class ReportSerializer:
         sql_query = "SELECT Books.book_title, count(Events.book_id) FROM Books RIGHT JOIN Events ON Books.id = Events.book_id GROUP BY book_title"
         result = execute_query_with_result(sql_query)
         return result 
+    
+    def getReaderProfileData(self,reader_id):
+        param = reader_id
+        sql_query_taken = "SELECT Count(*) FROM Events WHERE reader_id = %s"
+        sql_query_debt = "SELECT Count(*) FROM Events WHERE reader_id = %s AND transaction_return = NULL"
+        sql_query_last_visit = ""
+        sql_query_favorite_genre = ""
+        result = []
+        try:
+            result.append(execute_query_with_result(sql_query_taken,param))
+        except:
+            result.append([0])
+        try:
+            result.append(execute_query_with_result(sql_query_debt,param))
+        except:
+            result.append([0])
+        try:
+            result.append(execute_query_with_result(sql_query_last_visit,param))
+        except:
+            result.append([0])
+        try:
+            result.append(execute_query_with_result(sql_query_last_visit,param))
+        except:
+            result.append([0])
+        return result
+        

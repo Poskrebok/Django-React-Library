@@ -5,7 +5,6 @@ import {
   Container,
   Row,
   Col,
-  Dropdown,
   DropdownToggle,
   DropdownMenu,
   UncontrolledDropdown,
@@ -25,12 +24,24 @@ const BookList = () => {
   const [books, setBooks] = useState([]);
   const [genres, setGenres] = useState([]);
   const [Authors, setAuthors] = useState([]);
+  const [modal, setModal] = useState(false);
+  const [newBook, setNewBook] = useState({
+    book_title: '',
+    genre_id: '',
+    author_id: ''
+  });
+  const toggle = () => setModal(!modal);
 
   const history = useNavigate();
 
-  const handleRowClick = (courseId, stringValue) => {
+  const handleRowClick = (courseId, title, genreid, authorid, isreturned) => {
     history(`/Main/books/${courseId}`, {
-      state: { stringValue: stringValue }
+      state: {
+        title: title,
+        genreid: genreid,
+        authorid: authorid,
+        isReturned: isreturned,
+      }
     })
   };/*  */
 
@@ -47,6 +58,7 @@ const BookList = () => {
       return foundGenre[1];
     }
   }
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -75,13 +87,7 @@ const BookList = () => {
     fetchData();
   }, []);
 
-  const [modal, setModal] = useState(false);
-  const toggle = () => setModal(!modal);
-  const [newBook, setNewBook] = useState({
-    book_title: '',
-    genre_id: '',
-    author_id: ''
-  });
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setNewBook({
@@ -93,8 +99,8 @@ const BookList = () => {
 
   const handleBookCreate = async () => {
     console.log(newBook);
-    await axios.put(URLS.BOOKMANAGMENR, newBook ).then(response => {
-      console.log('Succes', response);
+    await axios.put(URLS.BOOKMANAGMENR, newBook).then(response => {
+      console.log('Success', response);
     }).catch(err => {
       console.error('Error', err);
     })
@@ -108,11 +114,11 @@ const BookList = () => {
           <div className="col">
             <Card className="shadow">
               <CardHeader className="border-0">
-                <Col>
-                  <h3 className="mb-0">Library</h3>
-                </Col>
-                <Col >
-                  <CardHeader className="border-0">
+                <Row>
+                  <Col lg="10">
+                    <h3 className="mb-0">Library</h3>
+                  </Col>
+                  <Col >
                     <Button color="primary" onClick={toggle}>Add book</Button>
                     <Modal isOpen={modal} toggle={toggle}>
                       <ModalHeader toggle={toggle}>Enter book title</ModalHeader>
@@ -170,8 +176,8 @@ const BookList = () => {
                         <Button color="Cancel" onClick={toggle}>Cancel</Button>
                       </ModalFooter>
                     </Modal>
-                  </CardHeader>
-                </Col>
+                  </Col>
+                </Row>
               </CardHeader>
               <Table className="align-items-center table-flush" responsive>
                 <thead className="thead-light">
@@ -185,7 +191,7 @@ const BookList = () => {
                 </thead>
                 <tbody>
                   {books.map((book) => (
-                    <tr key={book.id} onClick={() => handleRowClick(book[0],book[1])} style={{ cursor: 'pointer' }}>
+                    <tr key={book.id} onClick={() => handleRowClick(book[0], book[1], book[3], book[2],book[4])} style={{ cursor: 'pointer' }}>
                       <th scope="col">{book[1]}</th>
                       <th scope="col">{getAuthor(book[2])}</th>
                       <th scope="col">{getGenre(book[3])}</th>
