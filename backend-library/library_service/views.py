@@ -9,8 +9,7 @@ def handle_exceptions(view_func):
     def wrapped_view(request, *args, **kwargs):
         try:
             return view_func(request, *args, **kwargs)
-        except Exception as e:
-            error_message = str(e)
+        except:
             return Response("Internal server error", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
     return wrapped_view
