@@ -8,7 +8,7 @@ import routes from "../routes.js";
 const Layout = (props) => {
     const mainContent = React.useRef(null);
     const location = useLocation();
-    /* Ну, это нам нужно для прокрути, вроде */
+    /* Это нам нужно для прокрути */
     React.useEffect(() => {
         document.documentElement.scrollTop = 0;
         document.scrollingElement.scrollTop = 0;

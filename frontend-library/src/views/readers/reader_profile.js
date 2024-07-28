@@ -84,7 +84,7 @@ const ReaderProfile = () => {
         })
     }
 
-    /* Удаляет нашего читателя. Скорее всего работать не будет если на него есть записи в событиях.*/
+    /* Удаляет нашего читателя.*/
     const onDeleteReader = async () => {
         axios.delete(URLS.READERMANAGER, { data: { id: newReader.id } }).then(response => {
             console.log('Success', response);

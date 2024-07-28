@@ -35,7 +35,7 @@ const BookList = () => {
     author_id: ''
   });/* Форма для новой книги. */
 
-  /* Необходимое зло для работы модальных окон. */
+ /* Функция для открытия/зыкрытия модального окна. */
   const toggle = () => setModal(!modal);
 
   const history = useNavigate();

@@ -1,9 +1,8 @@
-from rest_framework import serializers
 from django.db import connection
 import datetime
 
 from .models import *
-#Все запросы к БД - здесь!!!
+#Все запросы к БД - здесь.
 
 #Функция с запросом к бд, без ответного результата.(Если у нас отсутствует ответный результат, то выкидывается ошибка, 
 # что создает некоторые проблемы при запросах, которые не должны ничего возвращать.)
@@ -64,7 +63,7 @@ class ReaderSerializer:
         result = execute_query_with_result(sql_query)
         return result
     
-    #reader должен иметь имя, и geoJSON.
+    #reader должен иметь имя.
     def add_reader(self,reader):
         sql_query = "INSERT INTO Readers (reader_name,adress) VALUES (%s,%s)"
         param = reader

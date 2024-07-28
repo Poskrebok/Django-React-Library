@@ -10,7 +10,7 @@ import {
     Container,
 } from "reactstrap";
 import { PropTypes } from "prop-types";
-/* Название говорит само за себя.*/
+/*  Боковая панель сайта.*/
 const Sidebar = (props) => {
     const [collapseOpen, setCollapseOpen] = useState();
     const activeRoute = (routeName) => {

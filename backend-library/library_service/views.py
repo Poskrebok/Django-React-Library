@@ -2,8 +2,7 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .serializer import *
-# Create your views here.
+from .dbconnections import *
 # Осуществляет прием запросана Добавление/Удаление/Изменение книги(Обработаем запросы на get,put,post.delete)
 class BookManager(APIView):
     #Получаю лист кортежей со всеми записями
@@ -48,6 +47,7 @@ class BookManager(APIView):
             return Response("Succes",status=status.HTTP_200_OK)
         else:
             return Response("Missing book ID to delete", status=status.HTTP_400_BAD_REQUEST)
+        
 # Осуществляет прием запросана Добавление/Удаление/Изменение автора
 class AuthorManager(APIView):
     #Получаю лист кортежей со всеми записями
@@ -195,7 +195,7 @@ class Reports(APIView):
         event_list = report_serializer.get_outdated_non_closed_events()
         return Response(event_list)
     
-    #Case Switch курильщика
+    #Case Switch
     switch = {
         'popGenres': get_genres,
         'popAuthor': get_authors,

@@ -7,7 +7,6 @@ import {
   Nav,
   Container,
 } from "reactstrap";
-/* В общем эта штука нужна для навигации layout-а */
 const LayoutNavbar = (props) => {
   return (
     <>
